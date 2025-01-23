@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DumbMonitor</title>
+    <style>
+        :root {
+            --card-radius: 12px;
+        }
+
+        :root[data-theme="light"] {
+            --primary-color: #333;
+            --background-color: #f5f5f5;
+            --card-background: #ffffff;
+            --text-muted: #666;
+            --border-color: rgba(0,0,0,0.05);
+            --shadow-color: rgba(0,0,0,0.1);
+            --error-background: #fff5f5;
+            --error-color: #dc2626;
+            --status-up-bg: #e3f9e5;
+            --status-up-color: #1b4400;
+            --status-down-bg: #ffe3e3;
+            --status-down-color: #5c0000;
+        }
+
+        :root[data-theme="dark"] {
+            --primary-color: #e1e1e1;
+            --background-color: #1a1a1a;
+            --card-background: #2d2d2d;
+            --text-muted: #a0a0a0;
+            --border-color: rgba(255,255,255,0.05);
+            --shadow-color: rgba(0,0,0,0.3);
+            --error-background: #2d1f1f;
+            --error-color: #ff4444;
+            --status-up-bg: #1b4400;
+            --status-up-color: #4ade80;
+            --status-down-bg: #450a0a;
+            --status-down-color: #fca5a5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--background-color);
+            line-height: 1.5;
+            transition: background-color 0.3s ease;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin: 1.5rem 0;
+            font-size: 2.5rem;
+        }
+
+        .config-info {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            background: var(--card-background);
+            padding: 1rem;
+            border-radius: var(--card-radius);
+            box-shadow: 0 2px 8px var(--shadow-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .website-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            margin-top: 1.5rem;
+        }
+
+        .website-card {
+            background: var(--card-background);
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .website-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow-color);
+        }
+
+        .website-url {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            word-break: break-all;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .status.up {
+            background: var(--status-up-bg);
+            color: var(--status-up-color);
+        }
+
+        .status.down {
+            background: var(--status-down-bg);
+            color: var(--status-down-color);
+        }
+
+        .details {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .details-label {
+            font-weight: 500;
+        }
+
+        .details-value {
+            color: var(--primary-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: var(--error-background);
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 2rem;
+                margin: 1rem 0;
+            }
+
+            .website-grid {
+                gap: 1rem;
+                grid-template-columns: 1fr;
+            }
+
+            .website-card {
+                padding: 1.25rem;
+            }
+
+            .config-info {
+                margin-bottom: 1.5rem;
+                padding: 0.75rem;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .website-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>DumbMonitor</h1>
+    <div class="config-info">
+        Backend check interval: <span id="checkInterval">Loading...</span><br>
+        UI refresh interval: <span id="refreshInterval">Loading...</span>
+    </div>
+    <div id="websites" class="website-grid"></div>
+
+    <script>
+        let updateInterval;
+
+        function formatInterval(ms) {
+            return ms < 1000 ? `${ms}ms` : `${ms/1000}s`;
+        }
+
+        // Set theme
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        // Fetch configuration and set up intervals
+        fetch('/api/config')
+            .then(response => response.json())
+            .then(config => {
+                document.getElementById('checkInterval').textContent = formatInterval(config.checkInterval);
+                document.getElementById('refreshInterval').textContent = formatInterval(config.uiRefreshInterval);
+                
+                // Set theme from config
+                setTheme(config.theme || 'light');
+                
+                // Clear existing interval if any
+                if (updateInterval) {
+                    clearInterval(updateInterval);
+                }
+                
+                // Set new interval based on configuration
+                updateInterval = setInterval(updateStatuses, config.uiRefreshInterval);
+            })
+            .catch(error => console.error('Error fetching config:', error));
+
+        function updateStatuses() {
+            fetch('/api/statuses')
+                .then(response => response.json())
+                .then(statuses => {
+                    const websitesDiv = document.getElementById('websites');
+                    websitesDiv.innerHTML = '';
+                    
+                    Object.entries(statuses).forEach(([url, status]) => {
+                        const card = document.createElement('div');
+                        card.className = 'website-card';
+                        
+                        const responseTime = status.responseTime ? `${status.responseTime}ms` : 'N/A';
+                        const statusCode = status.statusCode || 'N/A';
+                        
+                        card.innerHTML = `
+                            <div class="website-url">${url}</div>
+                            <div class="status-container">
+                                <span class="status ${status.status}">${status.status.toUpperCase()}</span>
+                            </div>
+                            <div class="details">
+                                <div class="details-row">
+                                    <span class="details-label">Response Time:</span>
+                                    <span class="details-value">${responseTime}</span>
+                                </div>
+                                <div class="details-row">
+                                    <span class="details-label">Status Code:</span>
+                                    <span class="details-value">${statusCode}</span>
+                                </div>
+                                <div class="details-row">
+                                    <span class="details-label">Last Checked:</span>
+                                    <span class="details-value">${new Date(status.lastChecked).toLocaleString()}</span>
+                                </div>
+                                ${status.error ? `<div class="error-message">${status.error}</div>` : ''}
+                            </div>
+                        `;
+                        
+                        websitesDiv.appendChild(card);
+                    });
+                })
+                .catch(error => console.error('Error fetching statuses:', error));
+        }
+
+        // Initial update
+        updateStatuses();
+    </script>
+</body>
+</html> 
