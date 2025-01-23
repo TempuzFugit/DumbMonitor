@@ -80,4 +80,10 @@ target/
 # Misc
 .history/
 *.bak
-*.backup 
+*.backup
+
+# Docker
+.docker/
+docker-compose.override.yml
+*.env
+!.env.example 
