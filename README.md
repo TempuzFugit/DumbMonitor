@@ -2,6 +2,10 @@
 
 A simple website monitoring application that checks website status and displays it in a clean interface. No authentication, no storage, just monitoring.
 
+A stupid simple website monitoring application that provides a clean, modern interface.
+
+No auth, no storage, no nothing. Just a simple dumb monitor to see the status of your favorite sites.
+
 ## Setup
 
 1. Install dependencies:
